@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>INDIA'S SIH | Live Ocean Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ocean: { 900: '#0c4a6e', 800: '#0369a1', 600: '#0284c7', 500: '#0ea5e9', 50: '#f0f9ff' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: radial-gradient(circle at top, #0f172a 0%, #020817 48%, #020617 100%);
+        }
+        .sim-btn {
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            color: #e2e8f0;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 9999px;
+            padding: 0.7rem 1.2rem;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+        .sim-btn.active {
+            background: linear-gradient(135deg, #0ea5e9, #0369a1);
+            color: white;
+            border-color: #7dd3fc;
+            box-shadow: 0 12px 24px rgba(14, 165, 233, 0.28);
+        }
+        .status-pill {
+            border-radius: 9999px;
+            padding: 0.35rem 0.8rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .ocean-panel {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(12, 74, 110, 0.8) 30%, rgba(10, 38, 57, 0.9));
+        }
+        canvas {
+            width: 100%;
+            height: 220px;
+            display: block;
+            background: rgba(2, 6, 23, 0.45);
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body class="text-slate-100 font-sans antialiased">
+    <header class="border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <div class="text-xs uppercase tracking-[0.28em] text-cyan-300">INDIA'S SIH</div>
+                <h1 class="text-2xl md:text-3xl font-black tracking-tight">Autonomous Ocean Simulation Lab</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-500 transition">Back to Landing Page</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+        <section class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-950/40">
+            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.25em] text-cyan-300 mb-2">Mission Control</p>
+                    <h2 class="text-3xl md:text-4xl font-black">100m vs 2000m Profiling Simulation</h2>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button class="sim-btn active" data-model="100">100m POC</button>
+                    <button class="sim-btn" data-model="2000">2000m Deep Sea</button>
+                    <button id="toggleRun" class="rounded-full bg-emerald-500 text-slate-900 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] hover:bg-emerald-400 transition">Pause</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-6">
+            <div class="ocean-panel rounded-3xl border border-slate-800 p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <div class="text-xs uppercase tracking-[0.22em] text-slate-300">Active model</div>
+                        <div class="text-3xl font-black" id="modelTitle">100m POC</div>
+                    </div>
+                    <div id="statusPill" class="status-pill bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Ready</div>
+                </div>
+
+                <div class="relative overflow-hidden rounded-2xl border border-cyan-500/30 bg-gradient-to-b from-blue-950 via-cyan-800 to-sky-700 h-[420px]">
+                    <div class="absolute inset-x-0 top-0 h-10 bg-white/10"></div>
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.25),transparent_20%)]"></div>
+                    <div class="absolute left-1/2 top-14 bottom-8 -translate-x-1/2 w-[6px] bg-white/25 rounded-full"></div>
+                    <div class="absolute left-1/2 -translate-x-1/2 w-16 h-16 rounded-full border-4 border-white/40 bg-cyan-300/20 shadow-lg" id="iceZone"></div>
+                    <div class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 border border-white/40" id="surfaceWaves"></div>
+                    <div class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-sky-200 shadow-lg transition-all duration-700" id="floatOrb"></div>
+                    <div class="absolute inset-x-0 bottom-5 flex justify-center gap-12 text-xs text-cyan-50/90 font-medium">
+                        <span>Surface</span>
+                        <span>Profile</span>
+                        <span>Abort</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs uppercase tracking-[0.2em] text-slate-300">Mission depth</span>
+                        <span class="text-xs uppercase tracking-[0.2em] text-slate-500" id="depthUnit">m</span>
+                    </div>
+                    <div class="text-5xl font-black text-cyan-300" id="depthValue">0 m</div>
+                    <div class="mt-4 h-3 bg-slate-800 rounded-full overflow-hidden">
+                        <div id="missionBar" class="h-full w-0 rounded-full bg-gradient-to-r from-emerald-400 via-cyan-500 to-sky-500 transition-all duration-700"></div>
+                    </div>
+                </div>
+
+                <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-5">
+                    <div class="text-xs uppercase tracking-[0.2em] text-slate-300 mb-3">Telemetry</div>
+                    <div class="space-y-4 text-sm">
+                        <div class="flex justify-between"><span class="text-slate-300">Pressure</span><span id="pressureValue" class="font-bold text-cyan-300">0.0 bar</span></div>
+                        <div class="flex justify-between"><span class="text-slate-300">Temperature</span><span id="tempValue" class="font-bold text-cyan-300">25.0°C</span></div>
+                        <div class="flex justify-between"><span class="text-slate-300">Salinity</span><span id="salinityValue" class="font-bold text-cyan-300">35.0 PSU</span></div>
+                        <div class="flex justify-between"><span class="text-slate-300">Sonar</span><span id="sonarValue" class="font-bold text-cyan-300">14.0 m</span></div>
+                        <div class="flex justify-between"><span class="text-slate-300">Battery</span><span id="batteryValue" class="font-bold text-cyan-300">96%</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-6">
+            <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <div class="text-xs uppercase tracking-[0.22em] text-slate-300">Depth profile</div>
+                        <div class="text-xl font-bold text-slate-100">Live sensor trend</div>
+                    </div>
+                    <div class="text-sm text-slate-300" id="profileLabel">0–100m</div>
+                </div>
+                <canvas id="profileCanvas" height="220"></canvas>
+            </div>
+
+            <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-5">
+                <div class="text-xs uppercase tracking-[0.22em] text-slate-300 mb-4">Mission log</div>
+                <div id="missionLog" class="space-y-3 text-sm text-slate-300"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const models = {
+            '100': {
+                title: '100m POC',
+                maxDepth: 100,
+                label: '0–100m',
+                phases: ['Launch', 'Shallow descent', 'Profile sampling', 'Surface recovery'],
+                depthScale: 1
+            },
+            '2000': {
+                title: '2000m Deep Sea',
+                maxDepth: 2000,
+                label: '0–2000m',
+                phases: ['Launch', 'Deep descent', 'Under-ice check', 'Surface recovery'],
+                depthScale: 0.5
+            }
+        };
+
+        const modelTitle = document.getElementById('modelTitle');
+        const depthValue = document.getElementById('depthValue');
+        const profileLabel = document.getElementById('profileLabel');
+        const missionBar = document.getElementById('missionBar');
+        const statusPill = document.getElementById('statusPill');
+        const pressureValue = document.getElementById('pressureValue');
+        const tempValue = document.getElementById('tempValue');
+        const salinityValue = document.getElementById('salinityValue');
+        const sonarValue = document.getElementById('sonarValue');
+        const batteryValue = document.getElementById('batteryValue');
+        const floatOrb = document.getElementById('floatOrb');
+        const missionLog = document.getElementById('missionLog');
+        const simButtons = document.querySelectorAll('.sim-btn');
+        const toggleRun = document.getElementById('toggleRun');
+        const canvas = document.getElementById('profileCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const state = {
+            model: '100',
+            running: true,
+            time: 0,
+            sampleHistory: []
+        };
+
+        function formatDepth(value) {
+            return `${Math.round(value)} m`;
+        }
+
+        function setModel(key) {
+            state.model = key;
+            state.time = 0;
+            state.sampleHistory = [];
+            modelTitle.textContent = models[key].title;
+            profileLabel.textContent = models[key].label;
+            simButtons.forEach((button) => {
+                button.classList.toggle('active', button.dataset.model === key);
+            });
+            updateLog(`Model selected: ${models[key].title}`);
+        }
+
+        function updateLog(line) {
+            const entry = document.createElement('div');
+            entry.className = 'rounded-xl border border-slate-700 bg-slate-800/70 p-2';
+            entry.textContent = line;
+            missionLog.prepend(entry);
+            while (missionLog.children.length > 5) {
+                missionLog.removeChild(missionLog.lastChild);
+            }
+        }
+
+        function drawGraph() {
+            const width = canvas.width;
+            const height = canvas.height;
+            ctx.clearRect(0, 0, width, height);
+
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.25)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = (height / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+
+            const maxDepth = models[state.model].maxDepth;
+            ctx.beginPath();
+            ctx.moveTo(0, height - 8);
+            const points = state.sampleHistory.length ? state.sampleHistory : Array.from({ length: 60 }, (_, idx) => Math.sin(idx / 8) * 0.5);
+            points.forEach((value, index) => {
+                const x = (index / (points.length - 1)) * width;
+                const y = height - 10 - ((value / maxDepth) * (height - 25));
+                if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
+            ctx.strokeStyle = '#7dd3fc';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.fillStyle = '#7dd3fc';
+            ctx.beginPath();
+            ctx.arc(width - 20, height - 10 - ((points[points.length - 1] / maxDepth) * (height - 25)), 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function updateSimulation() {
+            const model = models[state.model];
+            const cycle = (state.time % 18) / 18;
+            const depth = Math.abs(Math.sin(cycle * Math.PI * 2)) * model.maxDepth;
+            const ratio = depth / model.maxDepth;
+
+            let phase = 'Ready';
+            let className = 'status-pill border border-emerald-500/30 bg-emerald-500/15 text-emerald-300';
+            if (ratio > 0.8) {
+                phase = 'Profiling';
+                className = 'status-pill border border-cyan-500/30 bg-cyan-500/15 text-cyan-300';
+            } else if (ratio > 0.3) {
+                phase = 'Descending';
+                className = 'status-pill border border-amber-500/30 bg-amber-500/15 text-amber-300';
+            }
+            statusPill.className = className;
+            statusPill.textContent = phase;
+
+            const pressure = (depth / 10) + 1.1;
+            const temperature = 24 + (model.maxDepth - depth) * 0.006;
+            const salinity = 35 - (depth / model.maxDepth) * 1.8;
+            const sonar = Math.max(0.5, 22 - depth * 0.01);
+            const battery = Math.max(42, 100 - depth / model.maxDepth * 40);
+
+            depthValue.textContent = formatDepth(depth);
+            missionBar.style.width = `${(ratio * 100).toFixed(1)}%`;
+            pressureValue.textContent = `${pressure.toFixed(1)} bar`;
+            tempValue.textContent = `${temperature.toFixed(1)}°C`;
+            salinityValue.textContent = `${salinity.toFixed(1)} PSU`;
+            sonarValue.textContent = `${sonar.toFixed(1)} m`;
+            batteryValue.textContent = `${battery.toFixed(0)}%`;
+            floatOrb.style.bottom = `${6 + ratio * 80}%`;
+            floatOrb.style.left = '50%';
+            floatOrb.style.transform = `translateX(-50%) scale(${1 + ratio * 0.5})`;
+
+            state.sampleHistory.push(depth);
+            if (state.sampleHistory.length > 120) state.sampleHistory.shift();
+            drawGraph();
+        }
+
+        function loop(timestamp) {
+            if (state.running) {
+                state.time += 0.055;
+                updateSimulation();
+            }
+            requestAnimationFrame(loop);
+        }
+
+        simButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                setModel(button.dataset.model);
+            });
+        });
+
+        toggleRun.addEventListener('click', () => {
+            state.running = !state.running;
+            toggleRun.textContent = state.running ? 'Pause' : 'Resume';
+            toggleRun.className = state.running
+                ? 'rounded-full bg-emerald-500 text-slate-900 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] hover:bg-emerald-400 transition'
+                : 'rounded-full bg-amber-400 text-slate-900 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] hover:bg-amber-300 transition';
+        });
+
+        setModel('100');
+        updateSimulation();
+        requestAnimationFrame(loop);
+    </script>
+</body>
+</html>
