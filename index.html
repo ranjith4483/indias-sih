@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INDIA'S SIH | Autonomous Ocean Profiling Platform (SIH26065)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ocean: { 900: '#0c4a6e', 800: '#0369a1', 600: '#0284c7', 500: '#0ea5e9', 50: '#f0f9ff' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <!-- Header / Hero Section -->
+    <header class="bg-gradient-to-r from-ocean-900 via-ocean-800 to-slate-900 text-white py-12 px-6 shadow-xl">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="bg-amber-500 text-slate-900 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">SIH26065 • Ministry of Earth Sciences</span>
+                    <span class="text-2xl" title="Atmanirbhar Bharat">🇮🇳</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black tracking-tight mb-2">INDIA'S SIH</h1>
+                <p class="text-xl text-ocean-50 font-medium">Autonomous Low-Cost Ocean Observation Platform for Polar & Southern Oceans</p>
+            </div>
+            <div class="mt-6 md:mt-0 bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/20 text-center">
+                <div class="text-xs uppercase tracking-widest text-ocean-50 mb-1">National Hardware Edition</div>
+                <div class="text-2xl font-bold">Smart India Hackathon</div>
+                <div class="text-sm text-amber-400 font-semibold mt-1">Category: Robotics & Drones</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Quick Metrics Banner -->
+    <section class="max-w-6xl mx-auto px-6 -mt-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 100m POC Card -->
+            <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-ocean-600 flex justify-between items-center">
+                <div>
+                    <span class="text-xs font-bold text-ocean-600 uppercase tracking-wider">Proof of Concept</span>
+                    <h3 class="text-2xl font-black text-slate-900">100m POC Prototype</h3>
+                    <p class="text-slate-500 text-sm mt-1">Shallow coastal, river & estuary profiling</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-black text-emerald-600">₹17,650</div>
+                    <div class="text-xs text-slate-500 font-semibold">3.14 kg Gross Weight</div>
+                </div>
+            </div>
+            <!-- 2000m Deep Sea Card -->
+            <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-slate-900 flex justify-between items-center">
+                <div>
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Deep Sea Deployment</span>
+                    <h3 class="text-2xl font-black text-slate-900">2000m Deep-Sea Model</h3>
+                    <p class="text-slate-500 text-sm mt-1">Polar ice-fringe & deep ocean research</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-black text-blue-600">₹2,85,000</div>
+                    <div class="text-xs text-slate-500 font-semibold">14.50 kg Gross Weight</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-6 py-12 space-y-16">
+
+        <!-- Executive Summary -->
+        <section class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <span class="w-2 h-8 bg-ocean-600 rounded-full"></span> Executive Summary & MoES Alignment
+            </h2>
+            <p class="text-slate-700 leading-relaxed mb-4">
+                Commercial open-ocean Argo floats cost between $25,000 and $100,000+ (₹20L–₹80L+ INR) per unit and weigh 20–35 kg, requiring large research vessels and crane rigs. Furthermore, conventional floats lack active acoustic collision avoidance, rendering them vulnerable to destruction against overhead sea ice sheets during polar ascents.
+            </p>
+            <p class="text-slate-700 leading-relaxed">
+                <strong>INDIA'S SIH</strong> solves Ministry of Earth Sciences Problem Statement SIH26065 by providing an indigenous, ultra-low-cost, modular autonomous profiling float achieving an <strong>~90% cost reduction</strong>. It features an active upward-facing ultrasonic sonar (JSN-SR04T) that triggers an automatic Ice Abort Procedure within 3m of overhead ice, and a COTS sliding internal chassis enabling single-operator hand launches.
+            </p>
+        </section>
+
+        <!-- Master Comparison Table -->
+        <section class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <span class="w-2 h-8 bg-ocean-600 rounded-full"></span> Commercial Argo vs. INDIA'S SIH
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 text-sm uppercase tracking-wider">
+                            <th class="p-4 border-b">Metric / Feature</th>
+                            <th class="p-4 border-b">Commercial Core Argo</th>
+                            <th class="p-4 border-b text-ocean-800">INDIA'S SIH 100m POC</th>
+                            <th class="p-4 border-b text-ocean-800">INDIA'S SIH 2000m Model</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-sm">
+                        <tr>
+                            <td class="p-4 font-bold">Unit Cost</td>
+                            <td class="p-4 text-rose-600 font-semibold">$25k – $100k+ (₹20L–₹80L+)</td>
+                            <td class="p-4 text-emerald-600 font-bold">₹17,650 (~$210)</td>
+                            <td class="p-4 text-emerald-600 font-bold">₹2,85,000 (~$3,400)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-bold">Weight & Logistics</td>
+                            <td class="p-4">20 – 35 kg (Needs ship cranes)</td>
+                            <td class="p-4">3.14 kg (Single-person hand launch)</td>
+                            <td class="p-4">14.50 kg (Portable vessel launch)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-bold">Operational Band</td>
+                            <td class="p-4">Deep open ocean only (1k–2k m)</td>
+                            <td class="p-4">Shallow 0–100m (Estuaries & Coasts)</td>
+                            <td class="p-4">0–2,000m Universal Deep Sea</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-bold">Under-Ice Safety</td>
+                            <td class="p-4 text-rose-600">None (Risks total destruction)</td>
+                            <td class="p-4 text-ocean-600 font-semibold" colspan="2">Active Ultrasonic Sonar Ice Abort (Triggers at < 3m)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-bold">Architecture</td>
+                            <td class="p-4">Proprietary closed hardware</td>
+                            <td class="p-4 text-ocean-600 font-semibold" colspan="2">Modular COTS Sliding Sled (Rapid field repair)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Components & Engineering Breakdown -->
+        <section class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <span class="w-2 h-8 bg-ocean-600 rounded-full"></span> Key Subsystems & Engineering "Why"
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-5 bg-slate-50 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-lg text-ocean-900 mb-2">Buoyancy Engine</h3>
+                    <p class="text-xs font-semibold text-slate-500 mb-2">100m: NEMA 17 + T8 Lead Screw Syringe (±51.4g force)</p>
+                    <p class="text-sm text-slate-700"><strong>Why:</strong> Provides precise linear volume displacement (100 mL) for shallow profiling without expensive pumps.</p>
+                </div>
+                <div class="p-5 bg-slate-50 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-lg text-ocean-900 mb-2">Pressure Hull Structure</h3>
+                    <p class="text-xs font-semibold text-slate-500 mb-2">100m: Schedule 80 PVC (8.43x Safety Factor)</p>
+                    <p class="text-sm text-slate-700"><strong>Why:</strong> Extremely cost-effective, easy to machine, and withstands 10.08 Bar hydrostatic pressure with zero wall deformation.</p>
+                </div>
+                <div class="p-5 bg-slate-50 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-lg text-ocean-900 mb-2">Ice Avoidance Sonar</h3>
+                    <p class="text-xs font-semibold text-slate-500 mb-2">JSN-SR04T Waterproof Ultrasonic Sensor</p>
+                    <p class="text-sm text-slate-700"><strong>Why:</strong> Mounted facing upward to detect overhead polar ice sheets within 3m, triggering an emergency sink abort.</p>
+                </div>
+                <div class="p-5 bg-slate-50 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-lg text-ocean-900 mb-2">Sensor Data Sampling</h3>
+                    <p class="text-xs font-semibold text-slate-500 mb-2">Passive-Flow Hydrostatic Architecture</p>
+                    <p class="text-sm text-slate-700"><strong>Why:</strong> Water flows naturally past flush-mounted external ports during vertical drift, eliminating power-hungry internal pumps.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Judge Q&A Quick Reference -->
+        <section class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <span class="w-2 h-8 bg-ocean-600 rounded-full"></span> Key Numerical Values & Viva Quick-Ref
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="bg-ocean-50 p-4 rounded-xl border border-ocean-100">
+                    <div class="text-xs text-slate-500 uppercase font-semibold">POC Cost</div>
+                    <div class="text-xl font-black text-ocean-900 mt-1">₹17,650</div>
+                </div>
+                <div class="bg-ocean-50 p-4 rounded-xl border border-ocean-100">
+                    <div class="text-xs text-slate-500 uppercase font-semibold">POC Weight</div>
+                    <div class="text-xl font-black text-ocean-900 mt-1">3.14 kg</div>
+                </div>
+                <div class="bg-ocean-50 p-4 rounded-xl border border-ocean-100">
+                    <div class="text-xs text-slate-500 uppercase font-semibold">Hull Safety Factor</div>
+                    <div class="text-xl font-black text-ocean-900 mt-1">8.43x</div>
+                </div>
+                <div class="bg-ocean-50 p-4 rounded-xl border border-ocean-100">
+                    <div class="text-xs text-slate-500 uppercase font-semibold">Dive Energy Use</div>
+                    <div class="text-xl font-black text-ocean-900 mt-1">0.53 Wh</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-8 px-6 mt-20 text-center border-t border-slate-800">
+        <p class="text-sm">INDIA'S SIH • Smart India Hackathon 2026 • Proudly supporting <span class="text-white font-semibold">Atmanirbhar Bharat</span> 🇮🇳</p>
+    </footer>
+
+</body>
+</html>
