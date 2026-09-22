@@ -93,7 +93,7 @@
                         <div class="text-xs uppercase tracking-[0.22em] text-slate-300">Active model</div>
                         <div class="text-3xl font-black" id="modelTitle">100m POC</div>
                     </div>
-                    <div id="statusPill" class="status-pill bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Ready</div>
+                    <div id="statusPill" class="status-pill bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Standby & GPS Fix</div>
                 </div>
 
                 <div class="relative overflow-hidden rounded-2xl border border-cyan-500/30 bg-gradient-to-b from-blue-950 via-cyan-800 to-sky-700 h-[420px]">
@@ -161,15 +161,29 @@
                 title: '100m POC',
                 maxDepth: 100,
                 label: '0–100m',
-                phases: ['Launch', 'Shallow descent', 'Profile sampling', 'Surface recovery'],
-                depthScale: 1
+                phases: [
+                    'Low-Power Standby & GPS Fix',
+                    'Controlled Descent',
+                    'Deep Profiling & Neutral Hover',
+                    'Ascent & Active Ice Avoidance',
+                    'Surface Telemetry & Recovery'
+                ],
+                depthScale: 1,
+                minDepth: 0
             },
             '2000': {
                 title: '2000m Deep Sea',
                 maxDepth: 2000,
                 label: '0–2000m',
-                phases: ['Launch', 'Deep descent', 'Under-ice check', 'Surface recovery'],
-                depthScale: 0.5
+                phases: [
+                    'Low-Power Standby & GPS Fix',
+                    'Controlled Descent',
+                    'Deep Profiling & Neutral Hover',
+                    'Ascent & Active Ice Avoidance',
+                    'Surface Telemetry & Recovery'
+                ],
+                depthScale: 0.5,
+                minDepth: 0
             }
         };
 
@@ -194,17 +208,71 @@
             model: '100',
             running: true,
             time: 0,
-            sampleHistory: []
+            sampleHistory: [],
+            currentPhase: ''
         };
 
         function formatDepth(value) {
             return `${Math.round(value)} m`;
         }
 
+        function getMissionPhase() {
+            const model = models[state.model];
+            const cycle = (state.time % 24) / 24;
+
+            if (cycle < 0.18) {
+                return {
+                    name: model.phases[0],
+                    depth: 0.5 + (cycle / 0.18) * 4,
+                    ratio: (0.5 + (cycle / 0.18) * 4) / model.maxDepth,
+                    statusClass: 'status-pill border border-emerald-500/30 bg-emerald-500/15 text-emerald-300'
+                };
+            }
+            if (cycle < 0.42) {
+                const t = (cycle - 0.18) / 0.24;
+                const depth = 4 + t * (model.maxDepth * 0.96);
+                return {
+                    name: model.phases[1],
+                    depth,
+                    ratio: depth / model.maxDepth,
+                    statusClass: 'status-pill border border-amber-500/30 bg-amber-500/15 text-amber-300'
+                };
+            }
+            if (cycle < 0.66) {
+                const t = (cycle - 0.42) / 0.24;
+                const depth = model.maxDepth * (0.96 + Math.sin(t * Math.PI) * 0.02);
+                return {
+                    name: model.phases[2],
+                    depth,
+                    ratio: depth / model.maxDepth,
+                    statusClass: 'status-pill border border-cyan-500/30 bg-cyan-500/15 text-cyan-300'
+                };
+            }
+            if (cycle < 0.88) {
+                const t = (cycle - 0.66) / 0.22;
+                const depth = model.maxDepth * (0.96 - t * 0.96);
+                return {
+                    name: model.phases[3],
+                    depth,
+                    ratio: depth / model.maxDepth,
+                    statusClass: 'status-pill border border-rose-500/30 bg-rose-500/15 text-rose-300'
+                };
+            }
+
+            const depth = Math.max(0, 6 - ((cycle - 0.88) / 0.12) * 6);
+            return {
+                name: model.phases[4],
+                depth,
+                ratio: depth / model.maxDepth,
+                statusClass: 'status-pill border border-violet-500/30 bg-violet-500/15 text-violet-300'
+            };
+        }
+
         function setModel(key) {
             state.model = key;
             state.time = 0;
             state.sampleHistory = [];
+            state.currentPhase = '';
             modelTitle.textContent = models[key].title;
             profileLabel.textContent = models[key].label;
             simButtons.forEach((button) => {
@@ -259,21 +327,17 @@
 
         function updateSimulation() {
             const model = models[state.model];
-            const cycle = (state.time % 18) / 18;
-            const depth = Math.abs(Math.sin(cycle * Math.PI * 2)) * model.maxDepth;
-            const ratio = depth / model.maxDepth;
+            const phaseData = getMissionPhase();
+            const depth = phaseData.depth;
+            const ratio = phaseData.ratio;
 
-            let phase = 'Ready';
-            let className = 'status-pill border border-emerald-500/30 bg-emerald-500/15 text-emerald-300';
-            if (ratio > 0.8) {
-                phase = 'Profiling';
-                className = 'status-pill border border-cyan-500/30 bg-cyan-500/15 text-cyan-300';
-            } else if (ratio > 0.3) {
-                phase = 'Descending';
-                className = 'status-pill border border-amber-500/30 bg-amber-500/15 text-amber-300';
+            if (state.currentPhase !== phaseData.name) {
+                state.currentPhase = phaseData.name;
+                updateLog(`${model.title}: ${phaseData.name}`);
             }
-            statusPill.className = className;
-            statusPill.textContent = phase;
+
+            statusPill.className = phaseData.statusClass;
+            statusPill.textContent = phaseData.name;
 
             const pressure = (depth / 10) + 1.1;
             const temperature = 24 + (model.maxDepth - depth) * 0.006;
@@ -282,7 +346,7 @@
             const battery = Math.max(42, 100 - depth / model.maxDepth * 40);
 
             depthValue.textContent = formatDepth(depth);
-            missionBar.style.width = `${(ratio * 100).toFixed(1)}%`;
+            missionBar.style.width = `${Math.min(100, (ratio * 100).toFixed(1))}%`;
             pressureValue.textContent = `${pressure.toFixed(1)} bar`;
             tempValue.textContent = `${temperature.toFixed(1)}°C`;
             salinityValue.textContent = `${salinity.toFixed(1)} PSU`;
@@ -297,7 +361,7 @@
             drawGraph();
         }
 
-        function loop(timestamp) {
+        function loop() {
             if (state.running) {
                 state.time += 0.055;
                 updateSimulation();
