@@ -86,6 +86,8 @@
             </div>
         </section>
 
+        <section id="phaseCards" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3"></section>
+
         <section class="grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-6">
             <div class="ocean-panel rounded-3xl border border-slate-800 p-5">
                 <div class="flex items-center justify-between mb-4">
@@ -131,6 +133,16 @@
                         <div class="flex justify-between"><span class="text-slate-300">Salinity</span><span id="salinityValue" class="font-bold text-cyan-300">35.0 PSU</span></div>
                         <div class="flex justify-between"><span class="text-slate-300">Sonar</span><span id="sonarValue" class="font-bold text-cyan-300">14.0 m</span></div>
                         <div class="flex justify-between"><span class="text-slate-300">Battery</span><span id="batteryValue" class="font-bold text-cyan-300">96%</span></div>
+                    </div>
+                </div>
+
+                <div id="alarmBanner" class="rounded-3xl border border-amber-500/40 bg-amber-500/10 p-4 hidden">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <div class="text-[10px] uppercase tracking-[0.2em] text-amber-300 font-bold">Ice Abort</div>
+                            <div class="text-lg font-black text-amber-200">Overhead ice detected within 3.0m</div>
+                        </div>
+                        <div class="text-2xl">⚠️</div>
                     </div>
                 </div>
             </div>
@@ -199,6 +211,8 @@
         const batteryValue = document.getElementById('batteryValue');
         const floatOrb = document.getElementById('floatOrb');
         const missionLog = document.getElementById('missionLog');
+        const phaseCards = document.getElementById('phaseCards');
+        const alarmBanner = document.getElementById('alarmBanner');
         const simButtons = document.querySelectorAll('.sim-btn');
         const toggleRun = document.getElementById('toggleRun');
         const canvas = document.getElementById('profileCanvas');
@@ -209,7 +223,8 @@
             running: true,
             time: 0,
             sampleHistory: [],
-            currentPhase: ''
+            currentPhase: '',
+            iceAbort: false
         };
 
         function formatDepth(value) {
@@ -268,16 +283,33 @@
             };
         }
 
+        function renderPhaseCards() {
+            const activeModel = models[state.model];
+            phaseCards.innerHTML = activeModel.phases.map((phase, index) => {
+                const isActive = state.currentPhase === phase ? 'border-cyan-500 bg-cyan-500/10 text-cyan-100' : 'border-slate-700 bg-slate-900/70 text-slate-300';
+                const number = index + 1;
+                return `
+                    <div class="rounded-2xl border p-3 ${isActive}">
+                        <div class="text-[10px] uppercase tracking-[0.2em] opacity-80">Phase ${number}</div>
+                        <div class="mt-2 text-sm font-bold leading-snug">${phase}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function setModel(key) {
             state.model = key;
             state.time = 0;
             state.sampleHistory = [];
             state.currentPhase = '';
+            state.iceAbort = false;
+            alarmBanner.classList.add('hidden');
             modelTitle.textContent = models[key].title;
             profileLabel.textContent = models[key].label;
             simButtons.forEach((button) => {
                 button.classList.toggle('active', button.dataset.model === key);
             });
+            renderPhaseCards();
             updateLog(`Model selected: ${models[key].title}`);
         }
 
@@ -331,13 +363,25 @@
             const depth = phaseData.depth;
             const ratio = phaseData.ratio;
 
+            const iceRisk = phaseData.name === 'Ascent & Active Ice Avoidance' && depth < 12;
+            const shouldAbort = iceRisk && Math.random() < 0.35;
+            if (shouldAbort) {
+                state.iceAbort = true;
+                phaseData.name = 'Ice Abort Procedure';
+                phaseData.statusClass = 'status-pill border border-rose-500/40 bg-rose-500/15 text-rose-200';
+            } else if (phaseData.name === 'Ascent & Active Ice Avoidance') {
+                state.iceAbort = false;
+            }
+
             if (state.currentPhase !== phaseData.name) {
                 state.currentPhase = phaseData.name;
                 updateLog(`${model.title}: ${phaseData.name}`);
+                renderPhaseCards();
             }
 
             statusPill.className = phaseData.statusClass;
             statusPill.textContent = phaseData.name;
+            alarmBanner.classList.toggle('hidden', !state.iceAbort);
 
             const pressure = (depth / 10) + 1.1;
             const temperature = 24 + (model.maxDepth - depth) * 0.006;
