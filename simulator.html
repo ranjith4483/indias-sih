@@ -49,6 +49,87 @@
         .ocean-panel {
             background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(12, 74, 110, 0.8) 30%, rgba(10, 38, 57, 0.9));
         }
+        .ocean-scene {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.5rem;
+            border: 1px solid rgba(125, 211, 252, 0.38);
+            height: 420px;
+            background: linear-gradient(180deg, rgba(8, 47, 73, 1) 0%, rgba(14, 116, 144, 1) 32%, rgba(10, 134, 199, 0.9) 58%, rgba(3, 105, 161, 0.95) 100%);
+        }
+        .ocean-scene::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 15%, rgba(255,255,255,0.35), transparent 18%);
+        }
+        .wave {
+            position: absolute;
+            left: -10%;
+            width: 120%;
+            border-radius: 45% 55% 0 0 / 100% 100% 0 0;
+            background: rgba(125, 211, 252, 0.18);
+            border: 1px solid rgba(186, 230, 253, 0.28);
+            transform-origin: center;
+            animation: drift 14s ease-in-out infinite alternate;
+        }
+        .wave-1 {
+            height: 130px;
+            bottom: 52px;
+            opacity: 0.8;
+        }
+        .wave-2 {
+            height: 170px;
+            bottom: 18px;
+            animation-duration: 18s;
+            opacity: 0.9;
+        }
+        .wave-3 {
+            height: 120px;
+            bottom: 0;
+            background: rgba(14, 116, 144, 0.28);
+            animation-duration: 22s;
+        }
+        @keyframes drift {
+            0% { transform: translateX(-2%) scaleY(1) rotate(-1deg); }
+            50% { transform: translateX(2%) scaleY(1.05) rotate(1deg); }
+            100% { transform: translateX(-1%) scaleY(1.08) rotate(-0.5deg); }
+        }
+        .ice-cap {
+            position: absolute;
+            left: 50%;
+            bottom: 72%;
+            width: 120px;
+            height: 120px;
+            border-radius: 9999px;
+            transform: translateX(-50%);
+            border: 4px solid rgba(255,255,255,0.45);
+            background: rgba(186, 230, 253, 0.15);
+            box-shadow: 0 0 32px rgba(125, 211, 252, 0.25);
+        }
+        .float-orb {
+            position: absolute;
+            left: 50%;
+            width: 48px;
+            height: 48px;
+            border-radius: 9999px;
+            background: radial-gradient(circle at 30% 30%, #ffffff, #bae6fd 30%, #7dd3fc 60%, #38bdf8 100%);
+            box-shadow: 0 0 25px rgba(186, 230, 253, 0.9);
+            transform: translateX(-50%);
+            transition: bottom 0.7s ease, transform 0.7s ease, opacity 0.3s ease;
+        }
+        .bubble {
+            position: absolute;
+            border-radius: 9999px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            animation: bubble-rise 8s linear infinite;
+        }
+        @keyframes bubble-rise {
+            0% { transform: translateY(0) scale(0.7); opacity: 0; }
+            20% { opacity: 0.65; }
+            100% { transform: translateY(-180px) scale(1.2); opacity: 0; }
+        }
         canvas {
             width: 100%;
             height: 220px;
@@ -98,18 +179,24 @@
                     <div id="statusPill" class="status-pill bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Standby & GPS Fix</div>
                 </div>
 
-                <div class="relative overflow-hidden rounded-2xl border border-cyan-500/30 bg-gradient-to-b from-blue-950 via-cyan-800 to-sky-700 h-[420px]">
+                <div class="ocean-scene" aria-label="Ocean simulation">
                     <div class="absolute inset-x-0 top-0 h-10 bg-white/10"></div>
-                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.25),transparent_20%)]"></div>
                     <div class="absolute left-1/2 top-14 bottom-8 -translate-x-1/2 w-[6px] bg-white/25 rounded-full"></div>
-                    <div class="absolute left-1/2 -translate-x-1/2 w-16 h-16 rounded-full border-4 border-white/40 bg-cyan-300/20 shadow-lg" id="iceZone"></div>
+                    <div class="ice-cap" id="iceZone"></div>
                     <div class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 border border-white/40" id="surfaceWaves"></div>
-                    <div class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-sky-200 shadow-lg transition-all duration-700" id="floatOrb"></div>
+                    <div class="wave wave-1"></div>
+                    <div class="wave wave-2"></div>
+                    <div class="wave wave-3"></div>
+                    <div class="float-orb" id="floatOrb"></div>
                     <div class="absolute inset-x-0 bottom-5 flex justify-center gap-12 text-xs text-cyan-50/90 font-medium">
                         <span>Surface</span>
                         <span>Profile</span>
                         <span>Abort</span>
                     </div>
+                    <div class="bubble" style="left: 18%; bottom: 10%; width: 10px; height: 10px; animation-delay: 0s;"></div>
+                    <div class="bubble" style="left: 32%; bottom: 12%; width: 14px; height: 14px; animation-delay: 1.5s;"></div>
+                    <div class="bubble" style="left: 58%; bottom: 8%; width: 12px; height: 12px; animation-delay: 2.7s;"></div>
+                    <div class="bubble" style="left: 76%; bottom: 16%; width: 8px; height: 8px; animation-delay: 4s;"></div>
                 </div>
             </div>
 
@@ -396,7 +483,7 @@
             salinityValue.textContent = `${salinity.toFixed(1)} PSU`;
             sonarValue.textContent = `${sonar.toFixed(1)} m`;
             batteryValue.textContent = `${battery.toFixed(0)}%`;
-            floatOrb.style.bottom = `${6 + ratio * 80}%`;
+            floatOrb.style.bottom = `${6 + ratio * 78}%`;
             floatOrb.style.left = '50%';
             floatOrb.style.transform = `translateX(-50%) scale(${1 + ratio * 0.5})`;
 
